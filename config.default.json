@@ -1,0 +1,48 @@
+{
+    "mirai": {
+        "host": "http://127.0.0.1:8080",
+        "authKey": "",
+        "qq": 123456,
+        "enableWebsocket": false
+    },
+    "bot": {
+        "admin": 0,
+        "needAt": true,
+        "listenMode": 0,
+        "greet": "哈喽，我准备聊天了！",
+        "debug": false,
+        "tulingBot": {
+            "enable": true,
+            "apikey": "",
+            "chatLimit": 50,
+            "refuse": "今天聊得太多了，明天再聊吧~"
+        },
+        "picSearcher": {
+            "enable": true,
+            "saucenaoApiKey": "",
+            "saucenaoDB": "all",
+            "searchLimit": 20,
+            "refuse": "今日搜图次数达已上限，存着明天再搜吧~",
+            "setSimilarity": 75
+        },
+        "antiBiliMiniApp": {
+            "enable": true
+        }
+    },
+    "post": {
+        "reqType": 0,
+        "perception": {
+            "inputText": {
+                "text": ""
+            },
+            "inputImage": {
+                "url": ""
+            }
+        },
+        "userInfo": {
+            "apiKey": "",
+            "groupId": "",
+            "userId": ""
+        }
+    }
+}

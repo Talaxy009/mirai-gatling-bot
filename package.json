@@ -1,0 +1,26 @@
+{
+	"name": "mirai-gatling-bot",
+	"version": "1.0.0",
+	"description": "一个整合了搜图和聊天等功能的轻量 mirai 机器人",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Talaxy009/mirai-gatling-bot.git"
+	},
+	"keywords": [
+		"mirai-api-http",
+		"saucenao"
+	],
+	"author": "Talaxy009",
+	"license": "GPL-3.0",
+	"dependencies": {
+		"axios": "^0.21.1",
+		"node-mirai-sdk": "^0.2.3"
+	},
+	"devDependencies": {
+		"eslint": "^7.19.0"
+	}
+}
