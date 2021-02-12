@@ -1,11 +1,18 @@
 const process = require("process");
-const { default: Axios } = require("axios");
+const {
+	default: Axios
+} = require("axios");
 const Mirai = require("node-mirai-sdk");
 const config = require("./config.json");
 const Logger = require("./utils/logger.js");
 const getAppData = require("./utils/antiBiliMiniApp.js");
 const doSearch = require("./utils/saucenao.js");
-const { Plain, At, Image, App } = Mirai.MessageComponent;
+const {
+	Plain,
+	At,
+	Image,
+	App
+} = Mirai.MessageComponent;
 const bot = new Mirai(config.mirai);
 const url = "http://openapi.tuling123.com/openapi/api/v2";
 config.post.userInfo.apiKey = config.bot.tulingBot.apikey;
@@ -59,7 +66,13 @@ bot.onMessage(main);
  * @param {Object} message mirai消息对象
  */
 async function main(message) {
-	const { type, sender, messageChain, reply, quoteReply } = message;
+	const {
+		type,
+		sender,
+		messageChain,
+		reply,
+		quoteReply
+	} = message;
 
 	// 提取消息内容
 	let at = [];
@@ -110,8 +123,12 @@ async function main(message) {
 	// 若有小程序则获取其内容
 	if (hasApp) {
 		getAppData(appContent).then((appData) => {
-			reply(appData);
-			console.log(`${GetTime()} 反哔哩哔哩小程序成功`);
+			if (appData) {
+				reply(appData);
+				console.log(`${GetTime()} 反哔哩哔哩小程序成功`);
+			} else {
+				console.log(`${GetTime()} 反哔哩哔哩小程序失败，消息可能为番剧`);
+			}
 		}).catch(e => {
 			console.error(`${GetTime()} [error] in antiBiliMiniapp`);
 			console.error(e);
@@ -215,7 +232,9 @@ function GetTime() {
  * @param {Array<string>} imgs 图片链接
  */
 async function searchImg(imgs) {
-	let results = [[]];
+	let results = [
+		[]
+	];
 	// 决定搜索库
 	let db = 999;
 	switch (config.bot.picSearcher.saucenaoDB) {

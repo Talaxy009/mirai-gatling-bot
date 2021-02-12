@@ -7,7 +7,9 @@ const { Plain, Image } = Mirai.MessageComponent;
  * @param {object} content
  */
 async function antiBiliMiniApp(content) {
-	let qqdocurl = content.meta.detail_1.qqdocurl;
+	const qqdocurl = content.meta.detail_1.qqdocurl;
+	const isBangumi = /bilibili\.com\/bangumi|(b23|acg)\.tv\/(ep|ss)/.test(qqdocurl);
+	if (isBangumi) return;
 	let vid = await getAvBvFromMsg(qqdocurl);
 	return getVideoInfo(vid);
 }
