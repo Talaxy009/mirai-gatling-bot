@@ -4,13 +4,18 @@ const { Plain, Image } = Mirai.MessageComponent;
 
 /**
  * 反哔哩哔哩小程序
- * @param {object} content
+ * @param {any} content
  */
-async function antiBiliMiniApp(content) {
-	const qqdocurl = content.meta.detail_1.qqdocurl;
-	const isBangumi = /bilibili\.com\/bangumi|(b23|acg)\.tv\/(ep|ss)/.test(qqdocurl);
-	if (isBangumi) return;
-	let vid = await getAvBvFromMsg(qqdocurl);
+async function getBiliData(content) {
+	let vid;
+	if (typeof content === "string") {
+		vid = await getAvBvFromMsg(content);
+	} else {
+		const qqdocurl = content.meta.detail_1.qqdocurl;
+		const isBangumi = /bilibili\.com\/bangumi|(b23|acg)\.tv\/(ep|ss)/.test(qqdocurl);
+		if (isBangumi) return;
+		vid = await getAvBvFromMsg(qqdocurl);
+	}
 	return getVideoInfo(vid);
 }
 
@@ -98,4 +103,4 @@ async function getVideoInfo(vid) {
 	}
 }
 
-module.exports = antiBiliMiniApp;
+module.exports = getBiliData;
