@@ -117,12 +117,12 @@ async function doSearch(imgURL, db, apiKeys, setSimilarity) {
 					}
 				} else {
 					msg = [Plain("识别失败，请稍后再试，若多次失败可能是图片无法识别")];
-					console.error(`${new Date().toLocaleString} [error] saucenao[data]`);
+					console.error(`${new Date().toLocaleString()} [error] saucenao[data]`);
 					console.error(data);
 				}
 			})
 			.catch(e => {
-				console.error(`${new Date().toLocaleString} [error] saucenao[request]`);
+				console.error(`${new Date().toLocaleString()} [error] saucenao[request]`);
 				msg = [Plain("服务器请求失败，请稍候再试")];
 				if (e.response) {
 					if (e.response.status === 429) {
