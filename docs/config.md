@@ -30,7 +30,7 @@
             "refuse": "今日搜图次数达已上限，存着明天再搜吧~",
             "setSimilarity": 75
         },
-        "antiBiliMiniApp": {
+        "bilibili": {
             "enable": true
         }
     },
@@ -84,9 +84,9 @@
 - refuse——达到聊天次数上限后触发的回复
 - setSimilarity——设定相似度阈值，当相似度大于这个阈值则回复一个最高的搜索结果，否则回复所有的三个搜索结果
 
-### antiBiliMiniApp 分支
+### bilibili 分支
 
-- enable——是否启用反哔哩哔哩小程序
+- enable——是否启用哔哩哔哩模块（包括从小程序和直链获取视频信息）
 
 ## post 分支
 

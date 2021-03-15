@@ -1,18 +1,11 @@
 const process = require("process");
-const {
-	default: Axios
-} = require("axios");
+const { default: Axios } = require("axios");
 const Mirai = require("node-mirai-sdk");
 const config = require("./config.json");
 const Logger = require("./utils/logger.js");
-const getAppData = require("./utils/antiBiliMiniApp.js");
+const getBiliData = require("./utils/bilibili.js");
 const doSearch = require("./utils/saucenao.js");
-const {
-	Plain,
-	At,
-	Image,
-	App
-} = Mirai.MessageComponent;
+const { Plain, At, Image, App } = Mirai.MessageComponent;
 const bot = new Mirai(config.mirai);
 const url = "http://openapi.tuling123.com/openapi/api/v2";
 config.post.userInfo.apiKey = config.bot.tulingBot.apikey;
@@ -35,8 +28,8 @@ bot.onSignal("verified", () => {
 	if (config.bot.tulingBot.enable) {
 		console.log(`图灵机器人: 已启用\n\t聊天限制次数: ${config.bot.tulingBot.chatLimit}/QQ`);
 	}
-	if (config.bot.antiBiliMiniApp.enable) {
-		console.log("反哔哩哔哩小程序: 已启用");
+	if (config.bot.bilibili.enable) {
+		console.log("哔哩哔哩模块: 已启用");
 	}
 	if (config.bot.picSearcher.enable) {
 		console.log(`搜图: 已启用\n\t搜图限制次数: ${config.bot.picSearcher.searchLimit
@@ -80,7 +73,7 @@ async function main(message) {
 	let hasImg = false;
 	let msg = "";
 	let appContent = {};
-	let hasApp = false;
+	let hasBiliMsg = false;
 	let replyType = false;
 	let hit = true;
 	messageChain.forEach((chain) => {
@@ -90,6 +83,11 @@ async function main(message) {
 				break;
 			case "Plain":
 				msg += Plain.value(chain);
+				if (config.bot.bilibili.enable &&
+					msg.includes("www.bilibili.com/video/")) {
+					appContent = Plain.value(chain);
+					hasBiliMsg = true;
+				}
 				break;
 			case "Image":
 				imgs.push(Image.value(chain).url);
@@ -97,9 +95,9 @@ async function main(message) {
 				break;
 			case "App":
 				appContent = JSON.parse(App.value(chain));
-				if (config.bot.antiBiliMiniApp.enable &&
+				if (config.bot.bilibili.enable &&
 					appContent.desc === "哔哩哔哩") {
-					hasApp = true;
+					hasBiliMsg = true;
 				}
 				break;
 			default:
@@ -121,16 +119,16 @@ async function main(message) {
 	}
 
 	// 若有小程序则获取其内容
-	if (hasApp) {
-		getAppData(appContent).then((appData) => {
+	if (hasBiliMsg) {
+		getBiliData(appContent).then((appData) => {
 			if (appData) {
 				reply(appData);
-				console.log(`${GetTime()} 反哔哩哔哩小程序成功`);
+				console.log(`${GetTime()} 获取哔哩哔哩视频信息成功`);
 			} else {
-				console.log(`${GetTime()} 反哔哩哔哩小程序失败，消息可能为番剧`);
+				console.log(`${GetTime()} 获取哔哩哔哩视频信息失败，消息可能为番剧`);
 			}
 		}).catch(e => {
-			console.error(`${GetTime()} [error] in antiBiliMiniapp`);
+			console.error(`${GetTime()} [error] in bilibili`);
 			console.error(e);
 		});
 	} else if (hit) {

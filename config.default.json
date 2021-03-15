@@ -25,7 +25,7 @@
             "refuse": "今日搜图次数达已上限，存着明天再搜吧~",
             "setSimilarity": 75
         },
-        "antiBiliMiniApp": {
+        "bilibili": {
             "enable": true
         }
     },
