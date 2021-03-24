@@ -1,6 +1,6 @@
 {
 	"name": "mirai-gatling-bot",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "一个整合了搜图和聊天等功能的轻量 mirai 机器人",
 	"main": "index.js",
 	"scripts": {

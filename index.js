@@ -1,20 +1,20 @@
 const process = require("process");
-const { default: Axios } = require("axios");
-const Mirai = require("node-mirai-sdk");
 const config = require("./config.json");
-const Logger = require("./utils/logger.js");
-const getBiliData = require("./utils/bilibili.js");
-const doSearch = require("./utils/saucenao.js");
+const Mirai = require("node-mirai-sdk");
+const TBot = require("./utils/tulingBot");
+const Logger = require("./utils/logger");
 const { Plain, At, Image, App } = Mirai.MessageComponent;
+const { Out , GetTime } = require("./utils/utils");
+const getBiliData = require("./utils/bilibili");
+const doSearch = require("./utils/saucenao");
 const bot = new Mirai(config.mirai);
-const url = "http://openapi.tuling123.com/openapi/api/v2";
-config.post.userInfo.apiKey = config.bot.tulingBot.apikey;
+const tulingBot = new TBot(config.bot.tulingBot.apikey);
 
 let logger = new Logger();
 
 // auth 认证
 bot.onSignal("authed", () => {
-	console.log(`${GetTime()} 通过: ${bot.sessionKey} 认证中···`);
+	Out(`${GetTime()} 通过: ${bot.sessionKey} 认证中···`);
 	bot.verify();
 });
 
@@ -24,18 +24,18 @@ bot.onSignal("verified", () => {
 	if (config.bot.admin) {
 		bot.sendFriendMessage(messageChain, config.bot.admin);
 	}
-	console.log(`${GetTime()} 通过: ${bot.sessionKey} 认证成功!\n`);
+	Out(`${GetTime()} 通过: ${bot.sessionKey} 认证成功!\n`);
 	if (config.bot.tulingBot.enable) {
-		console.log(`图灵机器人: 已启用\n\t聊天限制次数: ${config.bot.tulingBot.chatLimit}/QQ`);
+		Out(`图灵机器人: 已启用\n\t聊天限制次数: ${config.bot.tulingBot.chatLimit}/QQ`);
 	}
 	if (config.bot.bilibili.enable) {
-		console.log("哔哩哔哩模块: 已启用");
+		Out("哔哩哔哩模块: 已启用");
 	}
 	if (config.bot.picSearcher.enable) {
-		console.log(`搜图: 已启用\n\t搜图限制次数: ${config.bot.picSearcher.searchLimit
+		Out(`搜图: 已启用\n\t搜图限制次数: ${config.bot.picSearcher.searchLimit
 		}/QQ\n\t所选 saucenao 数据库: ${config.bot.picSearcher.saucenaoDB}`);
 	}
-	console.log(
+	Out(
 		`是否需要@: ${config.bot.needAt ? "是" : "否"}\ndebug模式: ${config.bot.debug ? "是" : "否"}\n`
 	);
 	// 设置监听
@@ -123,9 +123,9 @@ async function main(message) {
 		getBiliData(appContent).then((appData) => {
 			if (appData) {
 				reply(appData);
-				console.log(`${GetTime()} 获取哔哩哔哩视频信息成功`);
+				Out(`${GetTime()} 获取哔哩哔哩视频信息成功`);
 			} else {
-				console.log(`${GetTime()} 获取哔哩哔哩视频信息失败，消息可能为番剧`);
+				Out(`${GetTime()} 获取哔哩哔哩视频信息失败，消息可能为番剧`);
 			}
 		}).catch(e => {
 			console.error(`${GetTime()} [error] in bilibili`);
@@ -142,9 +142,9 @@ async function main(message) {
 					results.forEach((result) => {
 						replyType ? quoteReply(result) : reply(result);
 						if (result.length === 1) {
-							console.log(`${GetTime()} 使用 saucenao 识图失败`);
+							Out(`${GetTime()} 使用 saucenao 识图失败`);
 						} else {
-							console.log(`${GetTime()} 使用 saucenao 识图成功`);
+							Out(`${GetTime()} 使用 saucenao 识图成功`);
 							logger.doneSearch(sender.id);
 						}
 					});
@@ -158,7 +158,7 @@ async function main(message) {
 			if (!logger.canChat(sender.id, config.bot.tulingBot.chatLimit)) {
 				reply(config.bot.tulingBot.refuse);
 			} else {
-				getMsg(msg, imgs[0], sender).then((gotMsg) => {
+				tulingBot.GetMsg(msg, imgs[0], sender, config.bot.debug).then((gotMsg) => {
 					replyType ? quoteReply(gotMsg) : reply(gotMsg);
 				}).catch(e => {
 					console.error(`${GetTime()} [error] in getMsg`);
@@ -173,57 +173,6 @@ async function main(message) {
 process.on("exit", () => {
 	bot.release();
 });
-
-/**
- * 调用 图灵API 获取消息
- * @param {string} msg 文本消息
- * @param {string} imgUrl 图像连接
- * @param {object} sender 消息发送人
- */
-async function getMsg(msg = "", imgUrl = "", sender) {
-	let PostBody = config.post;
-	let gotMsg = "";
-
-	// 构建用于 Post 的结构体
-	PostBody.userInfo.userId = sender.id;
-	PostBody.perception.inputText.text = msg;
-	PostBody.perception.inputImage.url = imgUrl;
-	PostBody.reqType = imgUrl !== "" ? 1 : 0;
-
-	try {
-		const {
-			data: {
-				results
-			},
-		} = await Axios.post(url, PostBody);
-		if (results.length === 1) {
-			gotMsg = results[0].values.text;
-		} else {
-			gotMsg = `${results[1].values.text}\n${results[0].values.url}`;
-		}
-
-		// debug模式
-		if (config.bot.debug) {
-			console.log("\n发送消息:");
-			console.log(PostBody);
-			console.log("接收消息:");
-			console.log(results);
-		} else {
-			console.log(`${GetTime()} 回复${sender.id}: ${gotMsg}`);
-		}
-		return gotMsg;
-	} catch (error) {
-		console.error(`${GetTime()} [error] in post`);
-		console.error(error);
-	}
-}
-
-/**
- * 获取当前时间
- */
-function GetTime() {
-	return new Date().toLocaleString();
-}
 
 /**
  * 搜图 TODO

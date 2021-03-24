@@ -28,21 +28,5 @@
         "bilibili": {
             "enable": true
         }
-    },
-    "post": {
-        "reqType": 0,
-        "perception": {
-            "inputText": {
-                "text": ""
-            },
-            "inputImage": {
-                "url": ""
-            }
-        },
-        "userInfo": {
-            "apiKey": "",
-            "groupId": "",
-            "userId": ""
-        }
     }
 }

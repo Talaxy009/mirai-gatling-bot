@@ -33,22 +33,6 @@
         "bilibili": {
             "enable": true
         }
-    },
-    "post": {
-        "reqType": 0,
-        "perception": {
-            "inputText": {
-                "text": ""
-            },
-            "inputImage": {
-                "url": ""
-            }
-        },
-        "userInfo": {
-            "apiKey": "",
-            "groupId": "",
-            "userId": ""
-        }
     }
 }
 ```
@@ -87,7 +71,3 @@
 ### bilibili 分支
 
 - enable——是否启用哔哩哔哩模块（包括从小程序和直链获取视频信息）
-
-## post 分支
-
-不要修改，这是机器人发送请求所用的格式，我只是省力保存在这了 ( = v =)ok
