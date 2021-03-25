@@ -1,9 +1,14 @@
 const { default: Axios } = require("axios");
-const { Out, GetTime } = require("./utils");
-const url = "http://openapi.tuling123.com/openapi/api/v2";
+const { out, getTime } = require("./utils");
 
 class TulingBot {
-	constructor(ApiKey) {
+	/**
+	 * 图灵机器人
+	 * @param {string} apiKey Apikey
+	 * @param {boolean} debug Debug 模式
+	 */
+	constructor(apiKey, debug) {
+		this.debug = debug;
 		this.postBody = {
 			reqType: 0,
 			perception: {
@@ -15,7 +20,7 @@ class TulingBot {
 				}
 			},
 			userInfo: {
-				apiKey: ApiKey,
+				apiKey: apiKey,
 				groupId: "",
 				userId: ""
 			}
@@ -23,13 +28,12 @@ class TulingBot {
 	}
 
 	/**
-	  * 调用 图灵API 获取消息
-	  * @param {string} msg 文本消息
-	  * @param {string} imgUrl 图像连接
-	* @param {object} sender 消息发送人
-	* @param {boolean} debugMode debug 模式
-	  */
-	async GetMsg(msg = "", imgUrl = "", sender, debugMode) {
+	 * 调用 图灵API 获取消息
+	 * @param {string} msg 文本消息
+	 * @param {string} imgUrl 图像连接
+	 * @param {object} sender 消息发送人
+	 */
+	async getMsg(msg = "", imgUrl = "", sender) {
 		let gotMsg = "";
 
 		// 构建用于 Post 的结构体
@@ -39,12 +43,11 @@ class TulingBot {
 		this.postBody.perception.inputImage.url = imgUrl;
 		this.postBody.reqType = imgUrl !== "" ? 1 : 0;
 
-		try {
-			const {
-				data: {
-					results
-				},
-			} = await Axios.post(url, this.postBody);
+		await Axios.post(
+			"http://openapi.tuling123.com/openapi/api/v2",
+			this.postBody
+		).then(ret => {
+			const results = ret.data.results;
 			if (results.length === 1) {
 				gotMsg = results[0].values.text;
 			} else {
@@ -52,20 +55,20 @@ class TulingBot {
 			}
 
 			// debug模式
-			if (debugMode) {
-				Out("\n发送消息:");
-				Out(this.postBody);
-				Out("接收消息:");
-				Out(results);
+			if (this.debug) {
+				out("\n发送消息:");
+				out(this.postBody);
+				out("接收消息:");
+				out(results);
 			} else {
-				Out(`${GetTime()} 回复${sender.id}: ${gotMsg}`);
+				out(`${getTime()} 回复${sender.id}: ${gotMsg}`);
 			}
-			return gotMsg;
-		} catch (error) {
-			console.error(`${GetTime()} [error] in post`);
-			console.error(error);
-		}
+		}).catch(e => {
+			console.error(`${getTime()} [error] in post`);
+			console.error(e);
+		});
+		return gotMsg;
 	}
 }
 
-module.exports = TulingBot; 
+module.exports = TulingBot;

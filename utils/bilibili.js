@@ -1,6 +1,7 @@
 const { default: Axios } = require("axios");
 const Mirai = require("node-mirai-sdk");
 const { Plain, Image } = Mirai.MessageComponent;
+const { getTime } = require("./utils");
 
 /**
  * 反哔哩哔哩小程序
@@ -64,7 +65,7 @@ async function getAvBvFromShortLink(shortLink) {
 		return getAvBvFromNormalLink(ret.headers.location);
 	} catch (e) {
 		console.error(
-			`${new Date().toLocaleString} [error] head request bilibili short link ${shortLink}`
+			`${getTime()} [error] head request bilibili short link ${shortLink}`
 		);
 		console.error(e);
 		return null;
