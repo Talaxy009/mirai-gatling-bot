@@ -10,32 +10,29 @@
 
 **注意**!
 
-如果你使用[go-cqhttp](https://github.com/Mrs4s/go-cqhttp)并且想要更丰富的功能请直接选择[cq-picsearcher-bot](https://github.com/Tsuk1ko/cq-picsearcher-bot)
+如果你使用 [go-cqhttp](https://github.com/Mrs4s/go-cqhttp) 并且想要更丰富的功能请直接选择 [cq-picsearcher-bot](https://github.com/Tsuk1ko/cq-picsearcher-bot)
 
 本项目可能存在未知bug，有待完善
 
 ## 目前包含的功能
 
 - [图灵机器人](http://www.turingapi.com/)
-
 - [Saucenao 搜图](https://saucenao.com/)
-
+- [Lolicon Api](https://api.lolicon.app/)
 - 反哔哩哔哩小程序
 
 ## 使用方法
 
 1. 克隆本项目 `git clone https://github.com/Talaxy009/mirai-gatling-bot.git`
-
 2. 移动到本地仓库 `cd ./mirai-gatling-bot`
-
 3. 安装依赖 `npm install`
-
 4. 复制一份 `config.default.json` 修改名字为 `config.json` 后对其进行编辑，设置文件相关说明在此 → [点我](./docs/config.md)
-
 5. 启动 `npm start`
 
 ## TODO
 
-- 移植 Ascii2d 图片搜索
+~~画线为已完成部分~~
 
-- 移植 Lolicon Api
+- 移植 Ascii2d 图片搜索
+- ~~移植 Lolicon Api~~
+- 添加撤回 setu 功能
