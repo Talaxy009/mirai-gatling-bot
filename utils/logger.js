@@ -6,6 +6,7 @@ class Logger {
 	constructor() {
 		this.chatTimes = [];
 		this.searchTimes = [];
+		this.shootTimes = [];
 		this.date = new Date().getDate();
 
 		// 每日初始化
@@ -15,6 +16,7 @@ class Logger {
 				this.date = nowDate;
 				this.chatTimes = [];
 				this.searchTimes = [];
+				this.shootTimes = [];
 			}
 		}, 60000);
 	}
@@ -28,6 +30,17 @@ class Logger {
 		if (limit == 0) return true;
 		if (!this.chatTimes[u]) this.chatTimes[u] = 0;
 		if (this.chatTimes[u]++ < limit) return true;
+		return false;
+	}
+	/**
+	 * 判断是否达到色图获取限制次数
+	 * @param {number} u 用户ID
+	 * @param {number} limit 上限值
+	 */
+	canShoot(u, limit) {
+		if (limit == 0) return true;
+		if (!this.shootTimes[u]) this.shootTimes[u] = 0;
+		if (this.shootTimes[u]++ < limit) return true;
 		return false;
 	}
 

@@ -1,20 +1,24 @@
 const process = require("process");
 const config = require("./config.json");
+const NamedRegExp = require("named-regexp-groups");
 const Mirai = require("node-mirai-sdk");
 const TBot = require("./utils/tulingBot");
+const STBot = require("./utils/setu");
 const Logger = require("./utils/logger");
 const { Plain, At, Image, App } = Mirai.MessageComponent;
-const { Out , GetTime } = require("./utils/utils");
+const { out , getTime } = require("./utils/utils");
 const getBiliData = require("./utils/bilibili");
 const doSearch = require("./utils/saucenao");
 const bot = new Mirai(config.mirai);
-const tulingBot = new TBot(config.bot.tulingBot.apikey);
+const tulingBot = new TBot(config.bot.tulingBot.apikey, config.bot.debug);
+const setuBot = new STBot(config.bot.setu, config.bot.debug);
+const setuReg = new NamedRegExp(config.bot.setu.reg);
 
 let logger = new Logger();
 
 // auth 认证
 bot.onSignal("authed", () => {
-	Out(`${GetTime()} 通过: ${bot.sessionKey} 认证中···`);
+	out(`${getTime()} 通过: ${bot.sessionKey} 认证中···`);
 	bot.verify();
 });
 
@@ -24,18 +28,21 @@ bot.onSignal("verified", () => {
 	if (config.bot.admin) {
 		bot.sendFriendMessage(messageChain, config.bot.admin);
 	}
-	Out(`${GetTime()} 通过: ${bot.sessionKey} 认证成功!\n`);
+	out(`${getTime()} 通过: ${bot.sessionKey} 认证成功!\n`);
 	if (config.bot.tulingBot.enable) {
-		Out(`图灵机器人: 已启用\n\t聊天限制次数: ${config.bot.tulingBot.chatLimit}/QQ`);
+		out(`图灵机器人: 已启用\n\t聊天限制次数: ${config.bot.tulingBot.chatLimit}/QQ`);
 	}
 	if (config.bot.bilibili.enable) {
-		Out("哔哩哔哩模块: 已启用");
+		out("哔哩哔哩模块: 已启用");
 	}
 	if (config.bot.picSearcher.enable) {
-		Out(`搜图: 已启用\n\t搜图限制次数: ${config.bot.picSearcher.searchLimit
+		out(`搜图: 已启用\n\t搜图限制次数: ${config.bot.picSearcher.searchLimit
 		}/QQ\n\t所选 saucenao 数据库: ${config.bot.picSearcher.saucenaoDB}`);
 	}
-	Out(
+	if (config.bot.setu.enable) {
+		out(`色图 bot: 已启用\n\t允许r18: ${config.bot.setu.r18 ? "是" : "否"}\n\t缩略图: ${config.bot.setu.thumbnail ? "是" : "否"}`);
+	}
+	out(
 		`是否需要@: ${config.bot.needAt ? "是" : "否"}\ndebug模式: ${config.bot.debug ? "是" : "否"}\n`
 	);
 	// 设置监听
@@ -74,20 +81,16 @@ async function main(message) {
 	let msg = "";
 	let appContent = {};
 	let hasBiliMsg = false;
+	let wantSetu = false;
 	let replyType = false;
 	let hit = true;
-	messageChain.forEach((chain) => {
+	messageChain.forEach(chain => {
 		switch (chain.type) {
 			case "At":
 				at.push(At.value(chain).target);
 				break;
 			case "Plain":
 				msg += Plain.value(chain);
-				if (config.bot.bilibili.enable &&
-					msg.includes("www.bilibili.com/video/")) {
-					appContent = Plain.value(chain);
-					hasBiliMsg = true;
-				}
 				break;
 			case "Image":
 				imgs.push(Image.value(chain).url);
@@ -105,6 +108,18 @@ async function main(message) {
 		}
 	});
 
+
+	// 去除消息中的空格
+	msg = msg.split(" ").join("");
+	if (config.bot.bilibili.enable &&
+		msg.includes("www.bilibili.com/video/")) {
+		appContent = msg;
+		hasBiliMsg = true;
+	}
+	if (config.bot.setu.enable && setuReg.test(msg)) {
+		wantSetu = true;
+	}
+
 	// 判断消息类型
 	switch (type) {
 		case "GroupMessage":
@@ -120,36 +135,47 @@ async function main(message) {
 
 	// 若有小程序则获取其内容
 	if (hasBiliMsg) {
-		getBiliData(appContent).then((appData) => {
+		getBiliData(appContent).then(appData => {
 			if (appData) {
 				reply(appData);
-				Out(`${GetTime()} 获取哔哩哔哩视频信息成功`);
+				out(`${getTime()} 获取哔哩哔哩视频信息成功`);
 			} else {
-				Out(`${GetTime()} 获取哔哩哔哩视频信息失败，消息可能为番剧`);
+				out(`${getTime()} 获取哔哩哔哩视频信息失败，消息可能为番剧`);
 			}
 		}).catch(e => {
-			console.error(`${GetTime()} [error] in bilibili`);
+			console.error(`${getTime()} [error] in bilibili`);
 			console.error(e);
 		});
 	} else if (hit) {
-		// 若消息包含图片且启用了搜图则搜图否则进行聊天
-		if (config.bot.picSearcher.enable && hasImg) {
+		if (wantSetu) {
+			// 判断射击次数
+			if (!logger.canShoot(sender.id, config.bot.setu.limit)) {
+				reply(config.bot.setu.refuse);
+			} else {
+				setuBot.getSetu(msg).then(setu => {
+					replyType ? quoteReply(setu) : reply(setu);
+				}).catch(e => {
+					console.error(`${getTime()} [error] in setuBot`);
+					console.error(e);
+				});
+			}
+		} else if (config.bot.picSearcher.enable && hasImg) {
 			// 判断搜索次数
 			if (!logger.canSearch(sender.id, config.bot.picSearcher.searchLimit)) {
 				reply(config.bot.picSearcher.refuse);
 			} else {
-				searchImg(imgs).then((results) => {
-					results.forEach((result) => {
+				searchImg(imgs).then(results => {
+					results.forEach(result => {
 						replyType ? quoteReply(result) : reply(result);
 						if (result.length === 1) {
-							Out(`${GetTime()} 使用 saucenao 识图失败`);
+							out(`${getTime()} 使用 saucenao 识图失败`);
 						} else {
-							Out(`${GetTime()} 使用 saucenao 识图成功`);
+							out(`${getTime()} 使用 saucenao 识图成功`);
 							logger.doneSearch(sender.id);
 						}
 					});
 				}).catch(e => {
-					console.error(`${GetTime()} [error] in searchImg`);
+					console.error(`${getTime()} [error] in searchImg`);
 					console.error(e);
 				});
 			}
@@ -158,10 +184,10 @@ async function main(message) {
 			if (!logger.canChat(sender.id, config.bot.tulingBot.chatLimit)) {
 				reply(config.bot.tulingBot.refuse);
 			} else {
-				tulingBot.GetMsg(msg, imgs[0], sender, config.bot.debug).then((gotMsg) => {
+				tulingBot.getMsg(msg, imgs[0], sender).then(gotMsg => {
 					replyType ? quoteReply(gotMsg) : reply(gotMsg);
 				}).catch(e => {
-					console.error(`${GetTime()} [error] in getMsg`);
+					console.error(`${getTime()} [error] in getMsg`);
 					console.error(e);
 				});
 			}
