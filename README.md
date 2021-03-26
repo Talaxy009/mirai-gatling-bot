@@ -31,8 +31,6 @@
 
 ## TODO
 
-~~画线为已完成部分~~
-
-- 移植 Ascii2d 图片搜索
-- ~~移植 Lolicon Api~~
-- ~~添加撤回 setu 功能~~
+- [x] 移植 Lolicon Api
+- [x] 添加撤回 setu 功能
+- [ ] 移植 Ascii2d 图片搜索
