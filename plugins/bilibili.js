@@ -1,7 +1,7 @@
 const { default: Axios } = require("axios");
 const Mirai = require("node-mirai-sdk");
 const { Plain, Image } = Mirai.MessageComponent;
-const { getTime } = require("./utils");
+const { getTime } = require("../utils/utils");
 
 /**
  * 反哔哩哔哩小程序

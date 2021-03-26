@@ -2,15 +2,16 @@ const process = require("process");
 const config = require("./config.json");
 const NamedRegExp = require("named-regexp-groups");
 const Mirai = require("node-mirai-sdk");
-const TBot = require("./utils/tulingBot");
-const STBot = require("./utils/setu");
+const TBot = require("./plugins/tulingBot");
+const STBot = require("./plugins/setuBot");
 const Logger = require("./utils/logger");
 const { Plain, At, Image, App } = Mirai.MessageComponent;
 const { out, getTime, recall } = require("./utils/utils");
-const getBiliData = require("./utils/bilibili");
-const doSearch = require("./utils/saucenao");
+const getBiliData = require("./plugins/bilibili");
+const pSearcher = require("./plugins/picSearcher");
 const bot = new Mirai(config.mirai);
 const tulingBot = new TBot(config.bot.tulingBot.apikey, config.bot.debug);
+const picSearcher = new pSearcher(config.bot.picSearcher);
 const setuBot = new STBot(config.bot.setu, config.bot.debug);
 const setuReg = new NamedRegExp(config.bot.setu.reg);
 
@@ -166,7 +167,7 @@ async function main(message) {
 			if (!logger.canSearch(sender.id, config.bot.picSearcher.searchLimit)) {
 				reply(config.bot.picSearcher.refuse);
 			} else {
-				searchImg(imgs).then(results => {
+				picSearcher.searchImg(imgs).then(results => {
 					results.forEach(result => {
 						replyType ? quoteReply(result) : reply(result);
 						if (result.length === 1) {
@@ -201,45 +202,3 @@ async function main(message) {
 process.on("exit", () => {
 	bot.release();
 });
-
-/**
- * 搜图
- * @param {Array<string>} imgs 图片链接
- */
-async function searchImg(imgs) {
-	let results = [[]];
-	// 决定搜索库
-	let db = 999;
-	switch (config.bot.picSearcher.saucenaoDB) {
-		case "all":
-			db = 999;
-			break;
-		case "pixiv":
-			db = 5;
-			break;
-		case "danbooru":
-			db = 9;
-			break;
-		case "doujin":
-			db = 18;
-			break;
-		case "anime":
-			db = 21;
-			break;
-		default:
-			console.error(
-				"[error] saucenaoDB 配置错误，请检查是否为: \"all\"|\"pixiv\"|\"danbooru\"|\"doujin\"|\"anime\" 中的一项，本次将使用\"all\""
-			);
-			break;
-	}
-	// 得到图片链接并搜图
-	for (let index = 0; index < imgs.length; index++) {
-		results[index] = await doSearch(
-			imgs[index],
-			db,
-			config.bot.picSearcher.saucenaoApiKey,
-			config.bot.picSearcher.setSimilarity
-		);
-	}
-	return results;
-}

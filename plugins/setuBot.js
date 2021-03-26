@@ -2,19 +2,19 @@ const { default: Axios } = require("axios");
 const NamedRegExp = require("named-regexp-groups");
 const Mirai = require("node-mirai-sdk");
 const { Plain, Image } = Mirai.MessageComponent;
-const { out, getTime } = require("./utils");
+const { out, getTime } = require("../utils/utils");
 
 class SetuBot {
 	/**
 	 * 色图 bot
-	 * @param {object} settings Setu bot 设置
+	 * @param {object} config Setu bot 设置
 	 * @param {*} debug Debug 模式
 	 */
-	constructor(settings, debug) {
-		this.setuReg = new NamedRegExp(settings.reg);
-		this.apikey = settings.apikey;
-		this.r18 = settings.r18;
-		this.thumbnail = settings.thumbnail;
+	constructor(config, debug) {
+		this.setuReg = new NamedRegExp(config.reg);
+		this.apikey = config.apikey;
+		this.r18 = config.r18;
+		this.thumbnail = config.thumbnail;
 		this.debug = debug;
 	}
 

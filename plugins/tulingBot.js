@@ -1,5 +1,5 @@
 const { default: Axios } = require("axios");
-const { out, getTime } = require("./utils");
+const { out, getTime } = require("../utils/utils");
 
 class TulingBot {
 	/**
