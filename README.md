@@ -35,4 +35,4 @@
 
 - 移植 Ascii2d 图片搜索
 - ~~移植 Lolicon Api~~
-- 添加撤回 setu 功能
+- ~~添加撤回 setu 功能~~
