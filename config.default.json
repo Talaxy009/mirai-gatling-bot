@@ -32,6 +32,7 @@
             "thumbnail": true,
             "refuse": "年轻人要懂得要节制喔",
             "limit": 30,
+            "recall": 60,
             "reg": "^[来來发發给給][张張个個幅点點份]?(?<r18>[Rr]18的?)?(?<keyword>.*?)?的?[色瑟][图圖]"
         },
         "bilibili": {

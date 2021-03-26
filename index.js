@@ -6,7 +6,7 @@ const TBot = require("./utils/tulingBot");
 const STBot = require("./utils/setu");
 const Logger = require("./utils/logger");
 const { Plain, At, Image, App } = Mirai.MessageComponent;
-const { out , getTime } = require("./utils/utils");
+const { out, getTime, recall } = require("./utils/utils");
 const getBiliData = require("./utils/bilibili");
 const doSearch = require("./utils/saucenao");
 const bot = new Mirai(config.mirai);
@@ -36,11 +36,13 @@ bot.onSignal("verified", () => {
 		out("哔哩哔哩模块: 已启用");
 	}
 	if (config.bot.picSearcher.enable) {
-		out(`搜图: 已启用\n\t搜图限制次数: ${config.bot.picSearcher.searchLimit
+		out(`搜图模块: 已启用\n\t搜图限制次数: ${config.bot.picSearcher.searchLimit
 		}/QQ\n\t所选 saucenao 数据库: ${config.bot.picSearcher.saucenaoDB}`);
 	}
 	if (config.bot.setu.enable) {
-		out(`色图 bot: 已启用\n\t允许r18: ${config.bot.setu.r18 ? "是" : "否"}\n\t缩略图: ${config.bot.setu.thumbnail ? "是" : "否"}`);
+		out(`色图模块: 已启用\n\t允许r18: ${config.bot.setu.r18 ? "是" : "否"
+		}\n\t缩略图: ${config.bot.setu.thumbnail ? "是" : "否"}\n\t限制次数: ${config.bot.setu.limit
+		}/QQ\n\t撤回: ${config.bot.setu.recall ? config.bot.setu.recall + "秒后" : "不撤回"}`);
 	}
 	out(
 		`是否需要@: ${config.bot.needAt ? "是" : "否"}\ndebug模式: ${config.bot.debug ? "是" : "否"}\n`
@@ -153,7 +155,7 @@ async function main(message) {
 				reply(config.bot.setu.refuse);
 			} else {
 				setuBot.getSetu(msg).then(setu => {
-					replyType ? quoteReply(setu) : reply(setu);
+					bot.reply(setu, message, replyType).then(ret => recall(bot, ret, config.bot.setu.recall));
 				}).catch(e => {
 					console.error(`${getTime()} [error] in setuBot`);
 					console.error(e);
@@ -201,13 +203,11 @@ process.on("exit", () => {
 });
 
 /**
- * 搜图 TODO
+ * 搜图
  * @param {Array<string>} imgs 图片链接
  */
 async function searchImg(imgs) {
-	let results = [
-		[]
-	];
+	let results = [[]];
 	// 决定搜索库
 	let db = 999;
 	switch (config.bot.picSearcher.saucenaoDB) {
