@@ -6,7 +6,7 @@
 {
     "mirai": {
         "host": "http://127.0.0.1:8080",
-        "authKey": "",
+        "verifyKey": "",
         "qq": 123456,
         "enableWebsocket": false
     },
@@ -20,14 +20,14 @@
             "enable": true,
             "apikey": "",
             "chatLimit": 50,
-            "refuse": "今天聊得太多了，明天再聊吧~"
+            "refuse": "今天聊得太多了，明天再聊吧～"
         },
         "picSearcher": {
             "enable": true,
             "saucenaoApiKey": "",
             "saucenaoDB": "all",
             "searchLimit": 20,
-            "refuse": "今日搜图次数达已上限，存着明天再搜吧~",
+            "refuse": "今日搜图次数达已上限，存着明天再搜吧～",
             "setSimilarity": 75
         },
         "setu": {
@@ -50,7 +50,7 @@
 ## mirai 分支（连接相关）
 
 - host——mirai-api-http 的地址和端口，默认是 `http://127.0.0.1:8080`
-- authKey——mirai-api-http 的 authKey（建议手动指定）
+- verifyKey——mirai-api-http 的 verifyKey（建议手动指定）
 - qq——当前 BOT 对应的 QQ 号
 - enableWebsocket——是否启用 Websocket（需要和 mirai-api-http 的设置一致）
 
