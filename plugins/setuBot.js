@@ -49,7 +49,7 @@ class SetuBot {
 			if (this.debug) {
 				out(setuRegExec.groups, data);
 			} else {
-				out(`${getTime()} 调用色图 api 成功, 本日剩余次数: ${data.quota}`);
+				out(`${getTime()} 调用色图 api 成功`);
 			}
 		}).catch(e => {
 			console.error(`${new Date().toLocaleString()} [error] setu[request]`);
