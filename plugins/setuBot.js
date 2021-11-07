@@ -28,12 +28,13 @@ class SetuBot {
 		const r18 = (this.r18 && typeof regGroup.r18 !== "undefined") ? 1 : 0;
 		const keyworld = regGroup.keyword || "";
 		let replyMsg = [];
-		await Axios.get("https://api.lolicon.app/setu/", {
+		await Axios.get("https://api.lolicon.app/setu/v1/", {
 			params: {
 				apikey: this.apikey,
 				size1200: this.thumbnail,
 				r18: r18,
-				keyword: keyworld
+				keyword: keyworld,
+				proxy: "i.pixiv.re"
 			}
 		}).then(ret => {
 			const data = ret.data;
