@@ -27,9 +27,8 @@
         },
         "setu": {
             "enable": true,
-            "apikey": "",
             "r18": false,
-            "thumbnail": true,
+            "size": "regular",
             "refuse": "年轻人要懂得要节制喔",
             "limit": 30,
             "recall": 60,

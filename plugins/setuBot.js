@@ -14,7 +14,7 @@ class SetuBot {
 		this.setuReg = new NamedRegExp(config.reg);
 		this.apikey = config.apikey;
 		this.r18 = config.r18;
-		this.thumbnail = config.thumbnail;
+		this.size = config.size;
 		this.debug = debug;
 	}
 
@@ -28,24 +28,22 @@ class SetuBot {
 		const r18 = (this.r18 && typeof regGroup.r18 !== "undefined") ? 1 : 0;
 		const keyword = regGroup.keyword || "";
 		let replyMsg = [];
-		await Axios.get("https://api.lolicon.app/setu/v1/", {
+		await Axios.get("https://api.lolicon.app/setu/v2/", {
 			params: {
-				apikey: this.apikey,
-				size1200: this.thumbnail,
+				size: this.size,
 				r18: r18,
 				keyword: keyword,
-				proxy: "i.pixiv.re"
 			}
 		}).then(ret => {
 			const data = ret.data;
 			const imgData = data.data[0];
-			if (data.code === 0) {
+			if (data.error) {
+				replyMsg.push(Plain(data.msg));
+			} else {
 				replyMsg.push(Image({
-					url: imgData.url
+					url: imgData.urls[this.size]
 				}));
 				replyMsg.push(Plain(`[${imgData.title}]${imgData.author}\nhttps://pixiv.net/i/${imgData.pid}`));
-			} else {
-				replyMsg.push(Plain(data.msg));
 			}
 			if (this.debug) {
 				out(setuRegExec.groups, data);
