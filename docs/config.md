@@ -32,9 +32,8 @@
         },
         "setu": {
             "enable": true,
-            "apikey": "",
             "r18": false,
-            "thumbnail": true,
+            "size": "regular",
             "refuse": "年轻人要懂得要节制喔",
             "limit": 30,
             "recall": 60,
@@ -81,9 +80,8 @@
 ### setu 分支
 
 - enable——是否启用色图
-- apikey——你的 lolicon apikey
 - r18——是否允许获取 r18 色图，若设为 `false` r18 请求会以普通色图回应
-- thumbnail——是否以缩略图回复
+- size——回复的图片尺寸，可为 "original"|"regular"|"small"|"thumb"|"mini"（画质从左到右递减）
 - refuse——达到次数上限后触发的回复
 - limit——每个 QQ 每天最高获取色图次数限制（若为 0 则不限制）
 - recall——在多少秒后撤回色图，设为 `0` 则为不撤回
