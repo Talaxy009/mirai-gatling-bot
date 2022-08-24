@@ -35,8 +35,8 @@ function formatNum(num) {
 async function getAvBvFromMsg(msg) {
 	let search;
 	if ((search = getAvBvFromNormalLink(msg))) return search;
-	if ((search = /(b23|acg)\.tv\/[0-9a-zA-Z]+/.exec(msg))) {
-		return getAvBvFromShortLink(`http://${search[0]}`);
+	if ((search = /((b23|acg)\.tv|bili2233.cn)\/[0-9a-zA-Z]+/.exec(msg))) {
+		return getAvBvFromShortLink(`https://${search[0]}`);
 	}
 	return null;
 }
@@ -47,7 +47,7 @@ async function getAvBvFromMsg(msg) {
  */
 function getAvBvFromNormalLink(link) {
 	if (typeof link !== "string") return null;
-	const search = /bilibili\.com\/video\/(?:[Aa][Vv]([0-9]+)|([Bb][Vv][0-9a-zA-Z]+))/.exec(link);
+	const search = /bilibili\.com\/video\/(?:av(\d+)|(bv[\da-z]+))/i.exec(link);
 	if (search) return { aid: search[1], bvid: search[2] };
 	return null;
 }
@@ -60,7 +60,7 @@ async function getAvBvFromShortLink(shortLink) {
 	try {
 		const ret = await Axios.head(shortLink, {
 			maxRedirects: 0,
-			validateStatus: (status_1) => status_1 >= 200 && status_1 < 400,
+			validateStatus: status => status >= 200 && status < 400,
 		});
 		return getAvBvFromNormalLink(ret.headers.location);
 	} catch (e) {
